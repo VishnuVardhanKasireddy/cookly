@@ -1,0 +1,12 @@
+# Environments
+.env
+.env.local
+
+# Dependency folders
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# IDE / System files
+.DS_Store
+.vscode/
