@@ -6,7 +6,7 @@ app.use(express.json())
 
 app.get("/health",(req,res)=>{
     res.status(200).send({
-        success : "true",
+        status : "success",
         message : "server is working properly !!!"
     })
 })
