@@ -21,6 +21,7 @@ const register = async(userData)=>{
         email : email.toLowerCase().trim(),
         password : hashedPassword
     })
+    
 
     return {
             id:user._id,
@@ -50,7 +51,24 @@ const login = async(userData)=>{
     return token
 }
 
+const getUser = async(userId)=>{
+    const user = await User.findOne({_id:userId})
+
+    if(!user){
+        throw new AppError("No User found!",404)
+    }
+
+    return {
+        _id:user._id,
+        name:user.name,
+        email:user.email,
+        role:user.role,
+        createdAt:user.createdAt
+    }
+}
+
 module.exports = {
     register,
-    login
+    login,
+    getUser
 }

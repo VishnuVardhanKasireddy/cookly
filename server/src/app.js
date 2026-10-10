@@ -6,10 +6,7 @@ const authRouter = require("./routes/auth_routes")
 const app = express()
 
 app.use(express.json())
-app.use((req, res, next) => {
-    console.log("Incoming request:", req.method, req.originalUrl);
-    next();
-});
+
 app.use("/api/auth",authRouter)
 
 app.get("/health",(req,res)=>{

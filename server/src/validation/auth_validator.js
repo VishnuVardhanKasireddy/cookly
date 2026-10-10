@@ -21,7 +21,7 @@ const validateRegister = (req,res,next)=>{
 const validateLogin = (req,res,next)=>{
     const {email,password} = req.body
 
-    if(!email || emailRegex.test(email.trim()))
+    if(!email || !emailRegex.test(email.trim()))
         return next(new AppError("Please check your email address",400))
     if(!password || typeof password !== "string" || password.trim()=='')
         return next(new AppError("Please check your password",400))
