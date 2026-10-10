@@ -2,12 +2,14 @@ const express = require("express")
 const AppError = require("./utils/AppError")
 const errorHandler = require("./middlewares/error_middleware")
 const authRouter = require("./routes/auth_routes")
+const recipeRouter = require("./routes/recipe_routes")
 
 const app = express()
 
 app.use(express.json())
 
 app.use("/api/auth",authRouter)
+app.use("/api/recipes",recipeRouter)
 
 app.get("/health",(req,res)=>{
     res.status(200).send({
