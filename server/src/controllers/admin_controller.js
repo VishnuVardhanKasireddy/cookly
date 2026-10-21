@@ -18,21 +18,21 @@ const getUsers = async(req,res,next)=>{
     }
 }
 
-const getUser = async(req,res,next)=>{
-    try{
-        const user = await getUserById(req.params.id)
+    const getUser = async(req,res,next)=>{
+        try{
+            const user = await getUserById(req.params.id)
 
-        res.status(200).json({
-            status:"success",
-            message:`User with ${user._id} id is retrived!`,
-            data:{
-                user
-            }
-        })
-    }catch(error){
-        next(error)
+            res.status(200).json({
+                status:"success",
+                message:`User with ${user._id} id is retrived!`,
+                data:{
+                    user
+                }
+            })
+        }catch(error){
+            next(error)
+        }
     }
-}
 
 const deleteUser = async(req,res,next)=>{
     try{
