@@ -9,7 +9,7 @@ const authenticate = async(req,res,next)=>{
         }
 
         if(!token){
-            return next(new AppError("Authentication is required! Please log-in"),401)
+            return next(new AppError("Authentication is required! Please log-in",401))
         }
 
         const decode = verifyToken(token)
