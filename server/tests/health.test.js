@@ -1,5 +1,10 @@
-const request = require("supertest")
-const app = require("../src/app")
+jest.mock("../src/services/ai_service", () => ({
+    generateRecipe: jest.fn(),
+    generateText: jest.fn()
+}));
+
+const request = require("supertest");
+const app = require("../src/app");
 
 
 describe("Server Health Checkup",()=>{

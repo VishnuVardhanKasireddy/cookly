@@ -1,6 +1,14 @@
 require("dotenv").config()
+
+jest.mock("../src/services/ai_service", () => ({
+    generateRecipe: jest.fn(),
+    generateText: jest.fn()
+}));
 const os = require("os")
 const mongoose = require("mongoose")
+
+
+const { generateRecipe } = require("../src/services/ai_service");
 const request = require("supertest")
 const app = require("../src/app")
 const User = require("../src/models/User")
@@ -28,7 +36,7 @@ const sampleRecipe = {
     ],
     cuisine: "Indian",
     servings: 1,
-    prepTime: 5,
+    prepTime: "5",
     cookTime: 5,
     difficulty: "easy"
 };
@@ -157,5 +165,120 @@ describe("Recipe End Points",()=>{
             expect(res.statusCode).toBe(400)
         })
     })
+
+    
+    describe("POST /api/recipes/generate", () => {
+
+        beforeEach(() => {
+            generateRecipe.mockReset();
+        });
+
+        it("should generate a recipe when given valid input and authorised", async () => {
+            generateRecipe.mockResolvedValue({
+                ...sampleRecipe,
+                prepTime: "5 minutes",
+                model: "gemini-2.5-flash"
+            });
+
+            const payload = {
+                inputIngredients: ["eggs", "onion", "chilli"],
+                cuisine: "Indian",
+                servings: 2,
+                difficulty: "easy"
+            };
+
+            const res = await request(app)
+                .post("/api/recipes/generate")
+                .set("Authorization", `Bearer ${token}`)
+                .send(payload);
+
+            expect(res.statusCode).toBe(200);
+            expect(res.body.status).toBe("success");
+            expect(res.body.data.recipe.title).toBe(sampleRecipe.title);
+            expect(res.body.data.recipe.model).toBe("gemini-2.5-flash");
+
+            expect(generateRecipe).toHaveBeenCalledWith(
+                payload.inputIngredients,
+                {
+                    cuisine: payload.cuisine,
+                    servings: payload.servings,
+                    difficulty: payload.difficulty
+                }
+            );
+        });
+        
+        it("should reject requests without authentication", async () => {
+            const payload = {
+                inputIngredients: ["eggs", "onion", "chilli"],
+                cuisine: "Indian",
+                servings: 2,
+                difficulty: "easy"
+            };
+
+            const res = await request(app)
+                .post("/api/recipes/generate")
+                .send(payload);
+
+            expect(res.statusCode).toBe(401);
+            expect(generateRecipe).not.toHaveBeenCalled();
+        });
+
+        it("should reject an empty list of ingredients", async () => {
+            const payload = {
+                inputIngredients: [],
+                cuisine: "Indian",
+                servings: 2,
+                difficulty: "easy"
+            };
+
+            const res = await request(app)
+                .post("/api/recipes/generate")
+                .set("Authorization", `Bearer ${token}`)
+                .send(payload);
+
+            expect(res.statusCode).toBe(400);
+            expect(generateRecipe).not.toHaveBeenCalled();
+        });
+
+        it("should reject empty ingredient strings", async () => {
+            const payload = {
+                inputIngredients: ["eggs", "   ", "onion"],
+                cuisine: "Indian",
+                servings: 2,
+                difficulty: "easy"
+            };
+
+            const res = await request(app)
+                .post("/api/recipes/generate")
+                .set("Authorization", `Bearer ${token}`)
+                .send(payload);
+
+            expect(res.statusCode).toBe(400);
+            expect(generateRecipe).not.toHaveBeenCalled();
+        });
+
+        it("should handle AI service failures", async () => {
+            generateRecipe.mockRejectedValue(
+                new Error("AI service unavailable")
+            );
+
+            const payload = {
+                inputIngredients: ["eggs", "onion", "chilli"],
+                cuisine: "Indian",
+                servings: 2,
+                difficulty: "easy"
+            };
+
+            const res = await request(app)
+                .post("/api/recipes/generate")
+                .set("Authorization", `Bearer ${token}`)
+                .send(payload);
+
+            expect(generateRecipe).toHaveBeenCalledTimes(1);
+            expect(res.statusCode).toBeGreaterThanOrEqual(500);
+        });
+
+    });
+
 
 })
