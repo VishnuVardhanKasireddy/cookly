@@ -1,4 +1,5 @@
 const { createRecipe,getUserRecipes,getRecipeById,deleteRecipe } = require("../services/recipe_services")
+const { generateRecipe } = require("../services/ai_service")
 
 const createNewRecipe = async(req,res,next)=>{
     try{
@@ -61,9 +62,38 @@ const removeRecipe = async(req,res,next)=>{
     }
 }
 
+const generateNewRecipe = async (req, res, next) => {
+    try {
+        const {
+            inputIngredients,
+            cuisine,
+            servings,
+            difficulty
+        } = req.body
+
+        const recipe = await generateRecipe(inputIngredients, {
+            cuisine,
+            servings,
+            difficulty
+        })
+        recipe.model = "gemini-2.5-flash"
+
+        res.status(200).json({
+            status: "success",
+            message: "Recipe generated successfully!",
+            data: {
+                recipe
+            }
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createNewRecipe,
     getAllRecipes,
     getRecipe,
-    removeRecipe
+    removeRecipe,
+    generateNewRecipe
 }

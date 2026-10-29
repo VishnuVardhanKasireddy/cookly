@@ -39,7 +39,7 @@ const validateRecipe = [
 
     body("servings").optional().isInt({min:1}).withMessage("Servings must be a number type"),
 
-    body("prepTime").optional().isNumeric().withMessage("Preparation time must be a number"),
+    body("prepTime").optional().isString().withMessage("Preparation time must be a string"),
 
     body("cookTime").optional().isNumeric().withMessage("Cook time must be number"),
 
@@ -47,7 +47,7 @@ const validateRecipe = [
 
     body("model").optional().isString().withMessage("Model must be a string"),
 
-    handleValidationError
+    handleValidationError   
 ]
 
 const validateRecipeId = [
@@ -58,7 +58,43 @@ const validateRecipeId = [
     handleValidationError
 ]
 
+const validateRecipeGeneration = [
+    body("inputIngredients")
+        .isArray({ min: 1 })
+        .withMessage("Provide at least one ingredient"),
+
+    body("inputIngredients.*")
+        .isString()
+        .withMessage("Each ingredient must be a string")
+        .bail()
+        .trim()
+        .notEmpty()
+        .withMessage("Ingredients must not be empty"),
+
+    body("cuisine")
+        .optional()
+        .isString()
+        .withMessage("Cuisine must be a string")
+        .bail()
+        .trim()
+        .notEmpty()
+        .withMessage("Cuisine must not be empty"),
+
+    body("servings")
+        .optional()
+        .isInt({ min: 1, max: 20 })
+        .withMessage("Servings must be an integer between 1 and 20"),
+
+    body("difficulty")
+        .optional()
+        .isIn(["easy", "medium", "hard"])
+        .withMessage("Difficulty must be easy, medium, or hard"),
+
+    handleValidationError
+]
+
 module.exports = {
     validateRecipe,
-    validateRecipeId
+    validateRecipeId,
+    validateRecipeGeneration
 }
