@@ -1,4 +1,5 @@
 const express = require("express")
+const cors = require("cors")
 const AppError = require("./utils/AppError")
 const errorHandler = require("./middlewares/error_middleware")
 const authRouter = require("./routes/auth_routes")
@@ -6,6 +7,15 @@ const recipeRouter = require("./routes/recipe_routes")
 const adminRouter = require("./routes/admin_routes")
 
 const app = express()
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 
 app.use(express.json())
 

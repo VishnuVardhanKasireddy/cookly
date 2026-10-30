@@ -1,1 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap');
+
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", sans-serif;
+  --font-brand: "Nunito", sans-serif;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+}
+
+
+select {
+  color-scheme: light;
+  accent-color: #15803d;
+}
+
+select:focus {
+  border-color: #16a34a;
+  outline-color: #16a34a;
+}
