@@ -47,7 +47,19 @@ const validateRecipe = [
 
     body("model").optional().isString().withMessage("Model must be a string"),
 
-    handleValidationError   
+    body("image").optional({ nullable: true }).isObject()
+    .withMessage("Image must be an object"),
+
+    body("image.imageUrl").optional().isURL()
+        .withMessage("Invalid image URL"),
+
+    body("image.photographer").optional().isString(),
+
+    body("image.photographerUrl").optional().isURL(),
+
+    body("image.photoUrl").optional().isURL(),
+
+        handleValidationError   
 ]
 
 const validateRecipeId = [

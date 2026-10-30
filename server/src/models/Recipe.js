@@ -35,8 +35,9 @@ const recipeSchema = new mongoose.Schema({
             },
             unit:{
                 type:String,
-                required:true,
-                trim:true
+                
+                trim:true,
+                default:""
             }
         }
     ],
@@ -76,6 +77,24 @@ const recipeSchema = new mongoose.Schema({
     model:{
         type:String,
         trim:true
+    },
+    image: {
+        imageUrl: {
+            type: String,
+            trim: true
+        },
+        photographer: {
+            type: String,
+            trim: true
+        },
+        photographerUrl: {
+            type: String,
+            trim: true
+        },
+        photoUrl: {
+            type: String,
+            trim: true
+        }
     }
 
 },{timestamps:true})

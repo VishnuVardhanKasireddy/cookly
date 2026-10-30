@@ -1,5 +1,6 @@
 const { createRecipe,getUserRecipes,getRecipeById,deleteRecipe } = require("../services/recipe_services")
 const { generateRecipe } = require("../services/ai_service")
+const searchRecipeImage = require("../services/unsplash_service");
 
 const createNewRecipe = async(req,res,next)=>{
     try{
@@ -62,6 +63,7 @@ const removeRecipe = async(req,res,next)=>{
     }
 }
 
+
 const generateNewRecipe = async (req, res, next) => {
     try {
         const {
@@ -69,14 +71,24 @@ const generateNewRecipe = async (req, res, next) => {
             cuisine,
             servings,
             difficulty
-        } = req.body
+        } = req.body;
 
+        // Generate recipe using Gemini
         const recipe = await generateRecipe(inputIngredients, {
             cuisine,
             servings,
             difficulty
-        })
-        recipe.model = "gemini-2.5-flash"
+        });
+
+        recipe.model = "gemini-2.5-flash";
+
+        // Retrieve a relevant food image using Unsplash
+        try {
+            recipe.image = await searchRecipeImage(recipe.title);
+        } catch (imageError) {
+            console.error("Unsplash image retrieval failed:", imageError.message);
+            recipe.image = null;
+        }
 
         res.status(200).json({
             status: "success",
@@ -84,11 +96,13 @@ const generateNewRecipe = async (req, res, next) => {
             data: {
                 recipe
             }
-        })
+        });
+
     } catch (error) {
         next(error);
     }
-}
+};
+
 
 module.exports = {
     createNewRecipe,

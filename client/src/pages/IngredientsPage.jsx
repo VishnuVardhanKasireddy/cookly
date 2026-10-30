@@ -1,5 +1,8 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { generateRecipe } from "../api/recipeService";
+import LoadingPage from "./LoadingPage";
 
 function IngredientsPage() {
   const [ingredientInput, setIngredientInput] = useState("");
@@ -8,6 +11,9 @@ function IngredientsPage() {
   const [difficulty, setDifficulty] = useState("medium");
   const [servings, setServings] = useState(2);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   function handleAddIngredient(event) {
     event.preventDefault();
@@ -40,13 +46,44 @@ function IngredientsPage() {
     setError("");
   }
 
-  function handleGenerateRecipes() {
-    console.log({
-      ingredients,
-      mealType,
-      diet,
-      servings,
-    });
+  async function handleGenerateRecipes() {
+    if (ingredients.length === 0) {
+      setError("Please add at least one ingredient.");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const recipe = await generateRecipe({
+        inputIngredients: ingredients,
+        cuisine,
+        servings,
+        difficulty,
+      });
+
+      console.log("Recipe image:", recipe.image);
+
+      navigate("/recipe", {
+        state: { recipe },
+      });
+
+    } catch (err) {
+      console.error("Recipe generation failed:", err);
+
+      setError(
+        err.response?.data?.message ||
+        "Unable to generate recipes. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Display the loading screen while Gemini generates the recipe.
+  if (loading) {
+    return <LoadingPage />;
   }
 
   return (
@@ -129,88 +166,84 @@ function IngredientsPage() {
           )}
         </section>
 
-       
-
-
         {/* Recipe preferences */}
         <section className="mt-8">
-        <h2 className="mb-3 text-base font-semibold">Recipe preferences</h2>
+          <h2 className="mb-3 text-base font-semibold">
+            Recipe preferences
+          </h2>
 
-        <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <div className="min-w-0">
-            <label
+              <label
                 htmlFor="cuisine"
                 className="mb-1.5 block truncate text-xs font-medium text-gray-600"
-            >
+              >
                 Cuisine
-            </label>
+              </label>
 
-            <select
+              <select
                 id="cuisine"
                 value={cuisine}
                 onChange={(event) => setCuisine(event.target.value)}
                 className="min-h-10 w-full min-w-0 rounded-2xl border border-gray-300 bg-white px-2 py-2 text-xs"
-            >
+              >
                 <option>Any</option>
                 <option>Indian</option>
                 <option>Italian</option>
                 <option>Chinese</option>
                 <option>Mexican</option>
                 <option>American</option>
-            </select>
+              </select>
             </div>
 
             <div className="min-w-0">
-            <label
+              <label
                 htmlFor="servings"
                 className="mb-1.5 block truncate text-xs font-medium text-gray-600"
-            >
+              >
                 Servings
-            </label>
+              </label>
 
-            <select
+              <select
                 id="servings"
                 value={servings}
                 onChange={(event) => setServings(Number(event.target.value))}
                 className="min-h-10 w-full min-w-0 rounded-2xl border border-gray-300 bg-white px-2 py-2 text-xs"
-            >
+              >
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-                <option key={count} value={count}>
+                  <option key={count} value={count}>
                     {count}
-                </option>
+                  </option>
                 ))}
-            </select>
+              </select>
             </div>
 
             <div className="min-w-0">
-            <label
+              <label
                 htmlFor="difficulty"
                 className="mb-1.5 block truncate text-xs font-medium text-gray-600"
-            >
+              >
                 Difficulty
-            </label>
+              </label>
 
-            <select
+              <select
                 id="difficulty"
                 value={difficulty}
                 onChange={(event) => setDifficulty(event.target.value)}
                 className="min-h-10 w-full min-w-0 rounded-2xl border border-gray-300 bg-white px-2 py-2 text-xs"
-            >
+              >
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
-            </select>
+              </select>
             </div>
-        </div>
+          </div>
         </section>
-
-
-
 
         {/* Generate recipes */}
         <button
           type="button"
-          disabled={ingredients.length === 0}
+          disabled={ingredients.length === 0 || loading}
           onClick={handleGenerateRecipes}
           className="mt-10 min-h-12 w-full rounded-xl bg-green-700 px-6 py-4 font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:bg-gray-300"
         >

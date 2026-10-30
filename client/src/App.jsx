@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import IngredientsPage from "./pages/IngredientsPage";
 import SavedRecipesPage from "./pages/SavedRecipesPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RecipeResultsPage from "./pages/RecipeResultsPage";
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/ingredients" element={ <ProtectedRoute><IngredientsPage /></ProtectedRoute>} />
         <Route path="/saved" element={<ProtectedRoute><SavedRecipesPage /></ProtectedRoute>} />
-
+        <Route path="/recipe" element={ <ProtectedRoute> <RecipeResultsPage /> </ProtectedRoute>}/>
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </MainLayout>
