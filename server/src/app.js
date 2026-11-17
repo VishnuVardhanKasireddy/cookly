@@ -8,9 +8,13 @@ const adminRouter = require("./routes/admin_routes")
 
 const app = express()
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://cookly-two.vercel.app/",
+];
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
