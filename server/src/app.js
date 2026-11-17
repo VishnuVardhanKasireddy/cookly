@@ -10,7 +10,7 @@ const app = express()
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://cookly-two.vercel.app/",
+  "https://cookly-two.vercel.app",
 ];
 app.use(
   cors({
